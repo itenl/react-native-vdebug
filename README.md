@@ -7,7 +7,9 @@
 - [x] 复制 cURL 至粘贴板
 - [x] 重新请求 URL
 - [x] 可视化 Response
-- [ ] Command 历史记录
+- [ ] Command 历史记录 (ing...)
+- [ ] Log 等级分类 (ing...)
+- [ ] 关键字过滤 Log / Network (ing...)
 
 ## Install
 
@@ -27,7 +29,14 @@ return <VDebug info={{ obj: 'your object' }} />
 ```
 
 ## Snapshot
+
 <img src="./snapshot/z3mcx-duskg.gif" />
+
+<img src="./snapshot/Snipaste_2020-10-07_18-14-33.png" />
+
+<img src="./snapshot/Snipaste_2020-10-07_18-14-48.png" />
+
+<img src="./snapshot/Snipaste_2020-10-07_18-15-06.png" />
 
 -------------------
 
