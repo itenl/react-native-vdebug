@@ -1,0 +1,37 @@
+# react-native-vdebug
+
+`React-Native 调试工具`
+
+### 支持情况
+- [x] Command 自定义上下文
+- [x] 复制 cURL 至粘贴板
+- [x] 重新请求 URL
+- [x] 可视化 Response
+- [ ] Command 历史记录
+
+## Install
+
+[Install NodeJS and suggest >= 8.11.0](https://nodejs.org/zh-cn/)
+
+## Usage
+
+```JavaScript
+npm install 'react-native-vdebug'
+
+import VDebug, { setExternalContext } from 'react-native-vdebug';
+
+setExternalContext('your context')
+
+return <VDebug info={{ obj: 'your object' }} />
+
+```
+
+## Snapshot
+<img src="./snapshot/z3mcx-duskg.gif" />
+
+-------------------
+
+`禁止商业用途 ❤ 研究学习范畴 ❤ 作者保留解释权`
+Commercial use is forbidden and The author reserves the right of interpretion
+
+[✶ MIT ✶](./LICENSE)
