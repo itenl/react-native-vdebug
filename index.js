@@ -162,7 +162,7 @@ class VDebug extends PureComponent {
           }}
           style={styles.commandBarInput}
           placeholderTextColor={'#000000a1'}
-          placeholder="command..."
+          placeholder="Command..."
           onChangeText={text => this.setState({ commandValue: text })}
           value={this.state.commandValue}
         />
