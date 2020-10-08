@@ -533,10 +533,11 @@ function proxyAjax(XHR, stack) {
   };
 }
 
-module.exports = (function () {
+export default Network;
+
+export const traceNetwork = () => {
   if (!ajaxStack) {
     ajaxStack = new AjaxStack();
+    proxyAjax(global.originalXMLHttpRequest || global.XMLHttpRequest, ajaxStack);
   }
-  proxyAjax(global.originalXMLHttpRequest || global.XMLHttpRequest, ajaxStack);
-  return <Network />;
-})();
+};

@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import { ScrollView, View, Text, TouchableOpacity, PanResponder, Animated, Dimensions, StyleSheet, TextInput, Keyboard, NativeModules, Platform, KeyboardAvoidingView } from 'react-native';
 import event from './src/event';
-import Network from './src/network';
-import Log from './src/console';
+import Network, { traceNetwork } from './src/network';
+import Log, { traceLog } from './src/log';
 import Info from './src/info';
 const { width, height } = Dimensions.get('window');
 
@@ -10,6 +10,12 @@ let externalContext = {};
 
 export const setExternalContext = context => {
   externalContext = context || {};
+};
+
+// Log/network trace when Element is not initialized.
+export const initTrace = () => {
+  traceLog();
+  traceNetwork();
 };
 
 function evalInContext(js, context) {
@@ -28,6 +34,7 @@ function evalInContext(js, context) {
 class VDebug extends PureComponent {
   constructor(props) {
     super(props);
+    initTrace();
     this.state = {
       commandValue: '',
       showPanel: false,
@@ -37,11 +44,11 @@ class VDebug extends PureComponent {
       panels: [
         {
           title: 'Log',
-          component: Log
+          component: <Log />
         },
         {
           title: 'Network',
-          component: Network
+          component: <Network />
         },
         {
           title: 'Info',

@@ -47,7 +47,7 @@ class LogStack {
   }
 }
 
-class Console extends Component {
+class Log extends Component {
   constructor(props) {
     super(props);
     this.name = 'Log';
@@ -194,10 +194,11 @@ function proxyConsole(console, stack) {
   });
 }
 
-module.exports = (function () {
+export default Log;
+
+export const traceLog = () => {
   if (!logStack) {
     logStack = new LogStack();
+    proxyConsole(global.console, logStack);
   }
-  proxyConsole(global.console, logStack);
-  return <Console />;
-})();
+};
