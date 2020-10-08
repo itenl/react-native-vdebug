@@ -116,56 +116,21 @@ class Log extends Component {
           <Text style={styles.headerText}>Index</Text>
           <Text style={styles.headerText}>Method</Text>
           <View style={[styles.headerText, { flexDirection: 'row', flex: 2 }]}>
-            <TouchableOpacity
-              onPress={() => {
-                this.setState({
-                  filterLevel: LEVEL_ENUM.All
-                });
-              }}
-              style={styles.headerTextLevel}
-            >
-              <Text style={styles.fontBold}>All</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                this.setState({
-                  filterLevel: LEVEL_ENUM.Log
-                });
-              }}
-              style={styles.headerTextLevel}
-            >
-              <Text style={styles.fontBold}>Log</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                this.setState({
-                  filterLevel: LEVEL_ENUM.Info
-                });
-              }}
-              style={styles.headerTextLevel}
-            >
-              <Text style={styles.fontBold}>Info</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                this.setState({
-                  filterLevel: LEVEL_ENUM.Warn
-                });
-              }}
-              style={styles.headerTextLevel}
-            >
-              <Text style={styles.fontBold}>Warn</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                this.setState({
-                  filterLevel: LEVEL_ENUM.Error
-                });
-              }}
-              style={styles.headerTextLevel}
-            >
-              <Text style={styles.fontBold}>Error</Text>
-            </TouchableOpacity>
+            {Object.keys(LEVEL_ENUM).map((key, index) => {
+              return (
+                <TouchableOpacity
+                  key={index.toString()}
+                  onPress={() => {
+                    this.setState({
+                      filterLevel: LEVEL_ENUM[key]
+                    });
+                  }}
+                  style={[styles.headerBtnLevel, this.state.filterLevel == LEVEL_ENUM[key] && { backgroundColor: '#eeeeee', borderColor: '#959595a1', borderWidth: 1 }]}
+                >
+                  <Text style={styles.headerTextLevel}>{key}</Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
         <View style={styles.filterValueBar}>
@@ -302,14 +267,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
     fontWeight: '700'
   },
-  headerTextLevel: {
+  headerBtnLevel: {
     flex: 1,
     borderColor: '#eee',
     borderWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: 2
   },
-  fontBold: {
-    fontWeight: '700'
+  headerTextLevel: {
+    fontWeight: '700',
+    textAlign: 'center'
   }
 });
 
