@@ -6,10 +6,10 @@ import Log, { traceLog } from './src/log';
 import Info from './src/info';
 const { width, height } = Dimensions.get('window');
 
-let externalContext = {};
+let commandContext = global;
 
-export const setExternalContext = context => {
-  externalContext = context || {};
+export const setExternalContext = externalContext => {
+  if (externalContext) commandContext = externalContext;
 };
 
 // Log/network trace when Element is not initialized.
@@ -17,19 +17,6 @@ export const initTrace = () => {
   traceLog();
   traceNetwork();
 };
-
-function evalInContext(js, context) {
-  return function (str) {
-    let result = '';
-    try {
-      // eslint-disable-next-line no-eval
-      result = eval(str);
-    } catch (err) {
-      result = 'Invalid input';
-    }
-    return event.trigger('addLog', result);
-  }.call(context, `with(this) { ${js} } `);
-}
 
 class VDebug extends PureComponent {
   constructor(props) {
@@ -112,16 +99,28 @@ class VDebug extends PureComponent {
     NativeModules?.DevMenu?.reload();
   }
 
-  execCommand = () => {
-    if (!this.state.commandValue) return;
-    const context = externalContext;
-    evalInContext(this.state.commandValue, context);
-    Keyboard.dismiss();
-  };
+  evalInContext(js, context) {
+    return function (str) {
+      let result = '';
+      try {
+        // eslint-disable-next-line no-eval
+        result = eval(str);
+      } catch (err) {
+        result = 'Invalid input';
+      }
+      return event.trigger('addLog', result);
+    }.call(context, `with(this) { ${js} } `);
+  }
 
-  clearCommand = () => {
+  execCommand() {
+    if (!this.state.commandValue) return;
+    this.evalInContext(this.state.commandValue, commandContext);
+    Keyboard.dismiss();
+  }
+
+  clearCommand() {
     this.textInput.clear();
-  };
+  }
 
   scrollToPage(index, animated = true) {
     this.scrollToCard(index, animated);
@@ -167,10 +166,10 @@ class VDebug extends PureComponent {
           onChangeText={text => this.setState({ commandValue: text })}
           value={this.state.commandValue}
         />
-        <TouchableOpacity style={styles.commandBarBtn} onPress={() => this.clearCommand()}>
+        <TouchableOpacity style={styles.commandBarBtn} onPress={this.clearCommand.bind(this)}>
           <Text>X</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.commandBarBtn} onPress={() => this.execCommand()}>
+        <TouchableOpacity style={styles.commandBarBtn} onPress={this.execCommand.bind(this)}>
           <Text>OK</Text>
         </TouchableOpacity>
       </View>
