@@ -10,6 +10,7 @@
 - [ ] Command 历史记录 (ing...)
 - [ ] Log 等级分类 (ing...)
 - [ ] 关键字过滤 Log / Network (ing...)
+- [ ] 导出所有 Log / Network (ing...)
 
 ## Install
 
