@@ -1,5 +1,11 @@
 # react-native-vdebug
 
+
+[![NPM Version](http://img.shields.io/npm/v/react-native-vdebug.svg?style=flat)](https://www.npmjs.org/package/react-native-vdebug)
+[![NPM Downloads](https://img.shields.io/npm/dm/react-native-vdebug.svg?style=flat)](https://npmcharts.com/compare/react-native-vdebug?minimal=true)
+[![install size](https://packagephobia.now.sh/badge?p=react-native-vdebug)](https://packagephobia.now.sh/result?p=react-native-vdebug)
+
+
 `React-Native 调试工具`
 
 ### 支持情况
