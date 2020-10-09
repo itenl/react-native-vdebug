@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Clipboard, View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { TextInput, Clipboard, View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import event from './event';
 import { debounce } from './tool';
 
@@ -71,6 +71,7 @@ class AjaxStack {
     // update dom
     const domData = {
       id,
+      index: item.index ?? this.requestIds.length + 1,
       host: item.host,
       url: item.url,
       status: item.status,
@@ -157,7 +158,8 @@ class Network extends Component {
     this.state = {
       showingId: null,
       requestIds: [],
-      requests: {}
+      requests: {},
+      filterValue: ''
     };
     ajaxStack.attach(currentRequest => {
       if (this.mountState) {
@@ -192,12 +194,44 @@ class Network extends Component {
   ListHeaderComponent() {
     const count = Object.keys(this.state.requests).length || 0;
     return (
-      <View style={[styles.nwHeader]}>
-        <Text style={[styles.nwHeaderTitle, styles.flex3, styles.bold]}>Name ({count})</Text>
-        <Text style={[styles.nwHeaderTitle, styles.flex1, styles.bold]}>Method</Text>
-        <Text style={[styles.nwHeaderTitle, styles.flex1, styles.bold]}>Status</Text>
-        <Text style={[styles.nwHeaderTitle, styles.bold, { width: 90 }]}>Time/Retry</Text>
+      <View>
+        <View style={[styles.nwHeader]}>
+          <Text style={[styles.nwHeaderTitle, styles.flex3, styles.bold]}>({count})Host</Text>
+          <Text style={[styles.nwHeaderTitle, styles.flex1, styles.bold]}>Method</Text>
+          <Text style={[styles.nwHeaderTitle, styles.flex1, styles.bold]}>Status</Text>
+          <Text style={[styles.nwHeaderTitle, styles.bold, { width: 90 }]}>Time/Retry</Text>
+        </View>
+        <View style={styles.filterValueBar}>
+          <TextInput
+            ref={ref => {
+              this.textInput = ref;
+            }}
+            style={styles.filterValueBarInput}
+            placeholderTextColor={'#000000a1'}
+            placeholder="After entering the content, please submit to filter..."
+            onSubmitEditing={({ nativeEvent }) => {
+              if (nativeEvent) {
+                this.regInstance = new RegExp(nativeEvent.text, 'ig');
+                this.setState({ filterValue: nativeEvent.text });
+              }
+            }}
+          />
+          <TouchableOpacity style={styles.filterValueBarBtn} onPress={this.clearFilterValue.bind(this)}>
+            <Text>X</Text>
+          </TouchableOpacity>
+        </View>
       </View>
+    );
+  }
+
+  clearFilterValue() {
+    this.setState(
+      {
+        filterValue: ''
+      },
+      () => {
+        this.textInput.clear();
+      }
     );
   }
 
@@ -227,6 +261,7 @@ class Network extends Component {
 
   renderItem({ item }) {
     const _item = this.state.requests[item] || {};
+    if (this.state.filterValue && this.regInstance && !this.regInstance.test(_item.url)) return null;
     return (
       <View style={styles.nwItem}>
         <TouchableOpacity
@@ -238,7 +273,7 @@ class Network extends Component {
         >
           <View style={[styles.nwHeader, this.state.showingId === _item.id && styles.active, _item.status >= 400 && styles.error]}>
             <Text numberOfLines={1} ellipsizeMode="middle" style={[styles.nwHeaderTitle, styles.flex3]}>
-              {_item.host}
+              {`(${_item.index})${_item.host}`}
             </Text>
             <Text style={[styles.nwHeaderTitle, styles.flex1]}>{_item.method}</Text>
             <Text numberOfLines={1} style={[styles.nwHeaderTitle, styles.flex1]}>
@@ -248,7 +283,7 @@ class Network extends Component {
               onPress={() => {
                 this.retryFetch(_item);
               }}
-              style={[styles.nwHeaderTitle, { width: 90 }]}
+              style={[styles.nwHeaderTitle, { width: 90, borderRadius: 20, borderColor: '#eeeeee', borderWidth: 1 }]}
             >
               <Text>{_item.costTime}</Text>
             </TouchableOpacity>
@@ -325,12 +360,6 @@ class Network extends Component {
               <View>
                 <Text style={[styles.nwItemDetailHeader, styles.bold]}>Form Data</Text>
                 <Text>{_item.postData}</Text>
-                {/* {Object.keys(_item.postData).map(key => (
-                  <View style={styles.nwDetailItem} key={key}>
-                    <Text>{key}:</Text>
-                    <Text>{_item.postData[key]}</Text>
-                  </View>
-                ))} */}
               </View>
             )}
             <View>
@@ -390,6 +419,24 @@ const styles = StyleSheet.create({
   nwDetailItem: {
     paddingLeft: 5,
     flexDirection: 'row'
+  },
+  filterValueBarBtn: {
+    width: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#eee'
+  },
+  filterValueBarInput: {
+    flex: 1,
+    paddingLeft: 10,
+    backgroundColor: '#ffffff',
+    color: '#000000'
+  },
+  filterValueBar: {
+    flexDirection: 'row',
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#eee'
   }
 });
 
@@ -533,10 +580,11 @@ function proxyAjax(XHR, stack) {
   };
 }
 
-module.exports = (function () {
+export default Network;
+
+export const traceNetwork = () => {
   if (!ajaxStack) {
     ajaxStack = new AjaxStack();
+    proxyAjax(global.originalXMLHttpRequest || global.XMLHttpRequest, ajaxStack);
   }
-  proxyAjax(global.originalXMLHttpRequest || global.XMLHttpRequest, ajaxStack);
-  return <Network />;
-})();
+};

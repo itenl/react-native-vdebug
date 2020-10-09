@@ -1,33 +1,27 @@
 import React, { PureComponent } from 'react';
 import { ScrollView, View, Text, TouchableOpacity, PanResponder, Animated, Dimensions, StyleSheet, TextInput, Keyboard, NativeModules, Platform, KeyboardAvoidingView } from 'react-native';
 import event from './src/event';
-import Network from './src/network';
-import Log from './src/console';
+import Network, { traceNetwork } from './src/network';
+import Log, { traceLog } from './src/log';
 import Info from './src/info';
 const { width, height } = Dimensions.get('window');
 
-let externalContext = {};
+let commandContext = global;
 
-export const setExternalContext = context => {
-  externalContext = context || {};
+export const setExternalContext = externalContext => {
+  if (externalContext) commandContext = externalContext;
 };
 
-function evalInContext(js, context) {
-  return function (str) {
-    let result = '';
-    try {
-      // eslint-disable-next-line no-eval
-      result = eval(str);
-    } catch (err) {
-      result = 'Invalid input';
-    }
-    return event.trigger('addLog', result);
-  }.call(context, `with(this) { ${js} } `);
-}
+// Log/network trace when Element is not initialized.
+export const initTrace = () => {
+  traceLog();
+  traceNetwork();
+};
 
 class VDebug extends PureComponent {
   constructor(props) {
     super(props);
+    initTrace();
     this.state = {
       commandValue: '',
       showPanel: false,
@@ -37,11 +31,11 @@ class VDebug extends PureComponent {
       panels: [
         {
           title: 'Log',
-          component: Log
+          component: <Log />
         },
         {
           title: 'Network',
-          component: Network
+          component: <Network />
         },
         {
           title: 'Info',
@@ -105,16 +99,28 @@ class VDebug extends PureComponent {
     NativeModules?.DevMenu?.reload();
   }
 
-  execCommand = () => {
-    if (!this.state.commandValue) return;
-    const context = externalContext;
-    evalInContext(this.state.commandValue, context);
-    Keyboard.dismiss();
-  };
+  evalInContext(js, context) {
+    return function (str) {
+      let result = '';
+      try {
+        // eslint-disable-next-line no-eval
+        result = eval(str);
+      } catch (err) {
+        result = 'Invalid input';
+      }
+      return event.trigger('addLog', result);
+    }.call(context, `with(this) { ${js} } `);
+  }
 
-  clearCommand = () => {
+  execCommand() {
+    if (!this.state.commandValue) return;
+    this.evalInContext(this.state.commandValue, commandContext);
+    Keyboard.dismiss();
+  }
+
+  clearCommand() {
     this.textInput.clear();
-  };
+  }
 
   scrollToPage(index, animated = true) {
     this.scrollToCard(index, animated);
@@ -156,14 +162,14 @@ class VDebug extends PureComponent {
           }}
           style={styles.commandBarInput}
           placeholderTextColor={'#000000a1'}
-          placeholder="command..."
+          placeholder="Command..."
           onChangeText={text => this.setState({ commandValue: text })}
           value={this.state.commandValue}
         />
-        <TouchableOpacity style={styles.commandBarBtn} onPress={() => this.clearCommand()}>
+        <TouchableOpacity style={styles.commandBarBtn} onPress={this.clearCommand.bind(this)}>
           <Text>X</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.commandBarBtn} onPress={() => this.execCommand()}>
+        <TouchableOpacity style={styles.commandBarBtn} onPress={this.execCommand.bind(this)}>
           <Text>OK</Text>
         </TouchableOpacity>
       </View>
@@ -189,7 +195,7 @@ class VDebug extends PureComponent {
   }
 
   onScrollAnimationEnd({ nativeEvent }) {
-    const currentPageIndex = Math.floor(nativeEvent.contentOffset.x / width);
+    const currentPageIndex = Math.floor(nativeEvent.contentOffset.x / Math.floor(width));
     currentPageIndex != this.state.currentPageIndex &&
       this.setState({
         currentPageIndex: currentPageIndex
