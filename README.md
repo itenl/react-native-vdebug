@@ -43,12 +43,11 @@ return <VDebug info={{ obj: 'your object' }} />
 <br />
 <img src="./snapshot/aka6s-nqpkq.jpg" />
 <br />
-<img src="./snapshot/a2wmv-9wikh.jpg" />
-<br />
 
 -------------------
 
 `禁止商业用途 ❤ 研究学习范畴 ❤ 作者保留解释权`
+<br />
 Commercial use is forbidden and The author reserves the right of interpretion
 
 [✶ MIT ✶](./LICENSE)
