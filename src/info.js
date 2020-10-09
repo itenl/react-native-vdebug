@@ -1,13 +1,25 @@
 import React, { Component } from 'react';
-import { ScrollView, View, Text } from 'react-native';
+import { Clipboard, ScrollView, View, Text } from 'react-native';
 import config from '../src/config';
 
 export default class Info extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      info: ''
+      info: '',
+      enabled: false
     };
+  }
+
+  verifyPassword() {
+    Clipboard.getString().then(password => {
+      const date = new Date();
+      if (password == `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}|itenl`) {
+        this.setState({
+          enabled: true
+        });
+      }
+    });
   }
 
   componentDidMount() {
@@ -27,13 +39,15 @@ export default class Info extends Component {
     this.setState({
       info
     });
+    this.verifyPassword();
   }
 
   render() {
     return (
       <ScrollView style={{ flex: 1, padding: 5 }}>
         <Text style={{ color: 'black' }}>{this.state.info}</Text>
-        <Text style={{ marginTop: 10000 }}>{`
+        <View style={{ marginTop: 1000 }}>
+          <Text style={!this.state.enabled && { opacity: 0.05 }}>{`
                                                 .::::.
                                               .::::::::::.
                                             ::::::::::::
@@ -53,7 +67,8 @@ export default class Info extends Component {
                           ':.            ':::::::::'                  :::::::::.
                                           '.:::::'                    ':'
         `}</Text>
-        <Text style={{ color: 'black', textAlign: 'center', margin: 10 }}>Goddess bless you, there will never be BUG.</Text>
+          <Text style={{ color: 'black', textAlign: 'center', margin: 10 }}>Goddess bless you, there will never be BUG.</Text>
+        </View>
       </ScrollView>
     );
   }
