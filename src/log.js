@@ -1,7 +1,15 @@
 import React, { Component } from 'react';
-import { FlatList, Text, StyleSheet, View } from 'react-native';
+import { TextInput, FlatList, Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import event from './event';
 import { debounce } from './tool';
+
+const LEVEL_ENUM = {
+  All: '',
+  Log: 'log',
+  Info: 'info',
+  Warn: 'warn',
+  Error: 'error'
+};
 
 let logStack = null;
 
@@ -23,6 +31,7 @@ class LogStack {
     }
     const date = new Date();
     this.logs.splice(0, 0, {
+      index: this.logs.length + 1,
       method,
       data: strLog(data),
       time: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`,
@@ -47,13 +56,16 @@ class LogStack {
   }
 }
 
-class Console extends Component {
+class Log extends Component {
   constructor(props) {
     super(props);
+
     this.name = 'Log';
     this.mountState = false;
     this.state = {
-      logs: []
+      logs: [],
+      filterLevel: ''
+      // filterValue: ''
     };
     logStack.attach(() => {
       if (this.mountState) {
@@ -95,10 +107,82 @@ class Console extends Component {
     this.flatList.scrollToEnd({ animated: true });
   };
 
+  filterCenter() {}
+
+  ListHeaderComponent() {
+    return (
+      <View>
+        <View style={{ flexDirection: 'row', backgroundColor: '#fff' }}>
+          <Text style={styles.headerText}>Index</Text>
+          <Text style={styles.headerText}>Method</Text>
+          <View style={[styles.headerText, { flexDirection: 'row', flex: 2 }]}>
+            {Object.keys(LEVEL_ENUM).map((key, index) => {
+              return (
+                <TouchableOpacity
+                  key={index.toString()}
+                  onPress={() => {
+                    this.setState({
+                      filterLevel: LEVEL_ENUM[key]
+                    });
+                  }}
+                  style={[styles.headerBtnLevel, this.state.filterLevel == LEVEL_ENUM[key] && { backgroundColor: '#eeeeee', borderColor: '#959595a1', borderWidth: 1 }]}
+                >
+                  <Text style={styles.headerTextLevel}>{key}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+        <View style={styles.filterValueBar}>
+          <TextInput
+            ref={ref => {
+              this.textInput = ref;
+            }}
+            style={styles.filterValueBarInput}
+            placeholderTextColor={'#000000a1'}
+            placeholder="After entering the content, please submit to filter..."
+            onSubmitEditing={({ nativeEvent }) => {
+              if (nativeEvent) {
+                this.regInstance = new RegExp(nativeEvent.text, 'ig');
+                this.setState({ filterValue: nativeEvent.text });
+              }
+            }}
+          />
+          <TouchableOpacity style={styles.filterValueBarBtn} onPress={this.clearFilterValue.bind(this)}>
+            <Text>X</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  clearFilterValue() {
+    this.setState(
+      {
+        filterValue: ''
+      },
+      () => {
+        this.textInput.clear();
+      }
+    );
+  }
+
   renderItem({ item }) {
+    if (this.state.filterLevel && this.state.filterLevel != item.method) return null;
+    if (this.state.filterValue && this.regInstance && !this.regInstance.test(item.data)) return null;
     return (
       <View style={styles.logItem}>
-        <Text style={styles.logItemTime}>{item.time}</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <View style={{ flex: 0.8 }}>
+            <Text style={styles.logItemTime}>{item.index}</Text>
+          </View>
+          <View style={{ flex: 0.8 }}>
+            <Text style={styles.logItemTime}>{item.method}</Text>
+          </View>
+          <View style={{ flex: 2 }}>
+            <Text style={styles.logItemTime}>{item.time}</Text>
+          </View>
+        </View>
         <Text style={[styles.logItemText, styles[item.method]]}>{item.data}</Text>
       </View>
     );
@@ -116,6 +200,8 @@ class Console extends Component {
         showsVerticalScrollIndicator
         extraData={this.state}
         data={this.state.logs}
+        stickyHeaderIndices={[0]}
+        ListHeaderComponent={this.ListHeaderComponent.bind(this)}
         renderItem={this.renderItem.bind(this)}
         ListEmptyComponent={() => <Text> Loading...</Text>}
         keyExtractor={item => item.id}
@@ -126,6 +212,9 @@ class Console extends Component {
 
 const styles = StyleSheet.create({
   log: {
+    color: '#000'
+  },
+  info: {
     color: '#000'
   },
   warn: {
@@ -148,7 +237,43 @@ const styles = StyleSheet.create({
     paddingVertical: 8
   },
   logItemTime: {
+    marginLeft: 5,
     fontSize: 11,
+    fontWeight: '700'
+  },
+  filterValueBarBtn: {
+    width: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#eee'
+  },
+  filterValueBarInput: {
+    flex: 1,
+    paddingLeft: 10,
+    backgroundColor: '#ffffff',
+    color: '#000000'
+  },
+  filterValueBar: {
+    flexDirection: 'row',
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#eee'
+  },
+  headerText: {
+    flex: 0.8,
+    borderColor: '#eee',
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 4,
+    paddingHorizontal: 2,
+    fontWeight: '700'
+  },
+  headerBtnLevel: {
+    flex: 1,
+    borderColor: '#eee',
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 2
+  },
+  headerTextLevel: {
     fontWeight: '700',
     textAlign: 'center'
   }
@@ -184,7 +309,7 @@ function formatLog(obj) {
 }
 
 function proxyConsole(console, stack) {
-  const methods = ['log', 'warn', 'error', 'info'];
+  const methods = [LEVEL_ENUM.Log, LEVEL_ENUM.Info, LEVEL_ENUM.Warn, LEVEL_ENUM.Error];
   methods.forEach(method => {
     const fn = console[method];
     console[method] = function (...args) {
@@ -194,10 +319,11 @@ function proxyConsole(console, stack) {
   });
 }
 
-module.exports = (function () {
+export default Log;
+
+export const traceLog = () => {
   if (!logStack) {
     logStack = new LogStack();
+    proxyConsole(global.console, logStack);
   }
-  proxyConsole(global.console, logStack);
-  return <Console />;
-})();
+};
