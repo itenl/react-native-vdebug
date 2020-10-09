@@ -37,13 +37,14 @@ return <VDebug info={{ obj: 'your object' }} />
 
 ## Snapshot
 
-<img src="./snapshot/z3mcx-duskg.gif" />
-
-<img src="./snapshot/Snipaste_2020-10-07_18-14-33.png" />
-
-<img src="./snapshot/Snipaste_2020-10-07_18-14-48.png" />
-
-<img src="./snapshot/Snipaste_2020-10-07_18-15-06.png" />
+<img src="./snapshot/79tx5-qew2r.gif" />
+<br />
+<img src="./snapshot/abovz-11w3r.jpg" />
+<br />
+<img src="./snapshot/aka6s-nqpkq.jpg" />
+<br />
+<img src="./snapshot/a2wmv-9wikh.jpg" />
+<br />
 
 -------------------
 
