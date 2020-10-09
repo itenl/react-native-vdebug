@@ -22,12 +22,14 @@ class VDebug extends PureComponent {
   constructor(props) {
     super(props);
     initTrace();
+    this.containerHeight = (height / 3) * 2;
     this.state = {
       commandValue: '',
       showPanel: false,
       currentPageIndex: 0,
       pan: new Animated.ValueXY(),
       scale: new Animated.Value(1),
+      panelHeight: new Animated.Value(0),
       panels: [
         {
           title: 'Log',
@@ -54,7 +56,7 @@ class VDebug extends PureComponent {
         Animated.spring(this.state.scale, {
           useNativeDriver: true,
           toValue: 1.3,
-          friction: 3
+          friction: 7
         }).start();
       },
       onPanResponderMove: Animated.event([null, { dx: this.state.pan.x, dy: this.state.pan.y }]),
@@ -64,7 +66,7 @@ class VDebug extends PureComponent {
           Animated.spring(this.state.scale, {
             useNativeDriver: true,
             toValue: 1,
-            friction: 3
+            friction: 7
           }).start(() => {
             this.setState({
               top: nativeEvent.pageY
@@ -81,9 +83,11 @@ class VDebug extends PureComponent {
   }
 
   togglePanel() {
-    this.setState(state => ({
-      showPanel: !state.showPanel
-    }));
+    // Animated.timing(this.state.panelHeight, {
+    //   toValue: this.state.panelHeight._value ? 0 : this.containerHeight,
+    //   duration: 100
+    // }).start();
+    this.state.panelHeight.setValue(this.state.panelHeight._value ? 0 : this.containerHeight);
   }
 
   clearLogs() {
@@ -155,7 +159,7 @@ class VDebug extends PureComponent {
 
   renderCommandBar() {
     return (
-      <View style={styles.commandBar}>
+      <KeyboardAvoidingView keyboardVerticalOffset={300} contentContainerStyle={{ flex: 1, flexDirection: 'row' }} behavior={'position'} style={styles.commandBar}>
         <TextInput
           ref={ref => {
             this.textInput = ref;
@@ -172,7 +176,7 @@ class VDebug extends PureComponent {
         <TouchableOpacity style={styles.commandBarBtn} onPress={this.execCommand.bind(this)}>
           <Text>OK</Text>
         </TouchableOpacity>
-      </View>
+      </KeyboardAvoidingView>
     );
   }
 
@@ -204,7 +208,7 @@ class VDebug extends PureComponent {
 
   renderPanel() {
     return (
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.panel}>
+      <Animated.View style={[styles.panel, { height: this.state.panelHeight }]}>
         {this.renderPanelHeader()}
         <ScrollView
           onMomentumScrollEnd={this.onScrollAnimationEnd.bind(this)}
@@ -226,11 +230,11 @@ class VDebug extends PureComponent {
         </ScrollView>
         {this.renderCommandBar()}
         {this.renderPanelFooter()}
-      </KeyboardAvoidingView>
+      </Animated.View>
     );
   }
 
-  renderHomeBtn() {
+  renderDebugBtn() {
     const { pan, scale } = this.state;
     const [translateX, translateY] = [pan.x, pan.y];
     const btnStyle = { transform: [{ translateX }, { translateY }, { scale }] };
@@ -243,7 +247,12 @@ class VDebug extends PureComponent {
   }
 
   render() {
-    return this.state.showPanel ? this.renderPanel() : this.renderHomeBtn();
+    return (
+      <View style={{ flex: 1 }}>
+        {this.renderPanel()}
+        {this.renderDebugBtn()}
+      </View>
+    );
   }
 }
 
@@ -253,14 +262,12 @@ const styles = StyleSheet.create({
   },
   panel: {
     position: 'absolute',
-    zIndex: 999999999,
-    elevation: 999999999,
+    zIndex: 99999,
+    elevation: 99999,
     backgroundColor: '#fff',
     width,
-    height: (height / 3) * 2,
     bottom: 0,
-    right: 0,
-    flexDirection: 'column'
+    right: 0
   },
   panelHeader: {
     width,
@@ -318,7 +325,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    zIndex: 999999999,
+    zIndex: 99999,
     bottom: height / 2,
     right: 0,
     shadowColor: 'rgb(18,34,74)',
