@@ -1,7 +1,12 @@
+import packagejson from '../../package.json';
+
 export default {
   APPINFO: {
-    author: 'ITENL',
-    pagehome: 'https://itenl.com',
-    version: '1.0.0'
+    name: packagejson.name,
+    author: packagejson.author,
+    homepage: 'https://itenl.com',
+    repository: packagejson.repository.url,
+    description: packagejson.description,
+    version: packagejson.version
   }
 };
