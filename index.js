@@ -195,7 +195,7 @@ class VDebug extends PureComponent {
   }
 
   onScrollAnimationEnd({ nativeEvent }) {
-    const currentPageIndex = Math.floor(nativeEvent.contentOffset.x / width);
+    const currentPageIndex = Math.floor(nativeEvent.contentOffset.x / Math.floor(width));
     currentPageIndex != this.state.currentPageIndex &&
       this.setState({
         currentPageIndex: currentPageIndex
