@@ -33,6 +33,27 @@ export default class Info extends Component {
     return (
       <ScrollView style={{ flex: 1, padding: 5 }}>
         <Text style={{ color: 'black' }}>{this.state.info}</Text>
+        <Text style={{ marginTop: 10000 }}>{`
+                                                .::::.
+                                              .::::::::::.
+                                            ::::::::::::
+                                        ..:::::::::::::'
+                                      ':::::::::::::'
+                                        .:::::::::::
+                                    '::::::::::::::..
+                                    ..:::::::::::::::::.
+                                    ::::::::::::::::::::
+                                  ::::  :::::::::::'       .:::.
+                                  ::::'   '::::::'       .::::::::.
+                                .::::'     :::::     .:::::::':::::.
+                              :.:::'      ::::::  .:::::::::' ':::::.
+                              .::'        :::::.:::::::::'      ':::::.
+                            .::'         ::::::::::::::'           ::::.
+                        ...:::           ::::::::::::'                ::.
+                          ':.            ':::::::::'                  :::::::::.
+                                          '.:::::'                    ':'
+        `}</Text>
+        <Text style={{ color: 'black', textAlign: 'center', margin: 10 }}>Goddess bless you, there will never be BUG.</Text>
       </ScrollView>
     );
   }

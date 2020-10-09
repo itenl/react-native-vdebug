@@ -13,9 +13,9 @@
 - [x] 复制 cURL 至粘贴板
 - [x] 重新请求 URL
 - [x] 可视化 Response
+- [x] Log 等级分类
+- [x] 关键字过滤 Log / Network
 - [ ] Command 历史记录 (ing...)
-- [ ] Log 等级分类 (ing...)
-- [ ] 关键字过滤 Log / Network (ing...)
 - [ ] 导出所有 Log / Network (ing...)
 
 ## Install
