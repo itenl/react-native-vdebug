@@ -274,8 +274,8 @@ const styles = StyleSheet.create({
   },
   panel: {
     position: 'absolute',
-    zIndex: 99999,
-    elevation: 99999,
+    zIndex: 99998,
+    elevation: 99998,
     backgroundColor: '#fff',
     width,
     bottom: 0,
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     shadowColor: 'rgb(18,34,74)',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
-    elevation: 0.4
+    elevation: 99999
   },
   homeBtnText: {
     color: '#fff'
