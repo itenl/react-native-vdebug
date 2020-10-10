@@ -30,20 +30,7 @@ class VDebug extends PureComponent {
       pan: new Animated.ValueXY(),
       scale: new Animated.Value(1),
       panelHeight: new Animated.Value(0),
-      panels: [
-        {
-          title: 'Log',
-          component: <Log />
-        },
-        {
-          title: 'Network',
-          component: <Network />
-        },
-        {
-          title: 'Info',
-          component: <Info info={this.props.info || {}} />
-        }
-      ]
+      panels: this.addPanels()
     };
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -80,6 +67,31 @@ class VDebug extends PureComponent {
 
   componentDidMount() {
     this.state.pan.setValue({ x: 0, y: 0 });
+  }
+
+  addPanels() {
+    let panels = [
+      {
+        title: 'Log',
+        component: <Log />
+      },
+      {
+        title: 'Network',
+        component: <Network />
+      },
+      {
+        title: 'Info',
+        component: <Info info={this.props.info || {}} />
+      }
+    ];
+    if (this.props.panels && this.props.panels.length) {
+      this.props.panels.forEach((item, index) => {
+        // support up to five extended panels
+        if (index >= 3) return;
+        if (item.title && item.component) panels.push(item);
+      });
+    }
+    return panels;
   }
 
   togglePanel() {
