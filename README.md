@@ -27,11 +27,23 @@
 ```JavaScript
 npm install 'react-native-vdebug'
 
-import VDebug, { setExternalContext } from 'react-native-vdebug';
+import VDebug, { initTrace, setExternalContext } from 'react-native-vdebug';
 
+// Before component Render, perform Proxy Console/Network (Optional)
+initTrace()
+
+// Context object when the command is executed (Optional)
 setExternalContext('your context')
 
-return <VDebug info={{ obj: 'your object' }} />
+return <VDebug 
+  // Expansion panel (Optional)
+  panels={[
+    title:'your title',
+    component:<your component />
+  ]} 
+  // Info panel (Optional)
+  info={{ obj: 'your object' }} 
+/>
 
 ```
 
@@ -45,9 +57,5 @@ return <VDebug info={{ obj: 'your object' }} />
 <br />
 
 -------------------
-
-`禁止商业用途 ❤ 研究学习范畴 ❤ 作者保留解释权`
-<br />
-Commercial use is forbidden and The author reserves the right of interpretion
 
 [✶ MIT ✶](./LICENSE)
