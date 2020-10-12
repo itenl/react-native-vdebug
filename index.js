@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import { ScrollView, View, Text, TouchableOpacity, PanResponder, Animated, Dimensions, StyleSheet, TextInput, Keyboard, NativeModules, Platform, KeyboardAvoidingView } from 'react-native';
 import event from './src/event';
@@ -19,6 +20,18 @@ export const initTrace = () => {
 };
 
 class VDebug extends PureComponent {
+  static propTypes = {
+    // Info panel (Optional)
+    info: PropTypes.object,
+    // Expansion panel (Optional)
+    panels: PropTypes.array
+  };
+
+  static defaultProps = {
+    info: {},
+    panels: null
+  };
+
   constructor(props) {
     super(props);
     initTrace();
