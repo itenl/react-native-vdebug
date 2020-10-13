@@ -39,7 +39,7 @@ return <VDebug
   // Expansion panel (Optional)
   panels={[
     title:'your title',
-    component:<your component />
+    component: your component
   ]} 
   // Info panel (Optional)
   info={{ obj: 'your object' }} 

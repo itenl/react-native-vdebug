@@ -77,7 +77,7 @@ class Log extends Component {
     });
   }
 
-  getScrollInstance() {
+  getScrollRef() {
     return this.flatList;
   }
 

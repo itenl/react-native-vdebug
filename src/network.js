@@ -171,7 +171,7 @@ class Network extends Component {
     });
   }
 
-  getScrollInstance() {
+  getScrollRef() {
     return this.flatList;
   }
 
