@@ -5,6 +5,8 @@ import event from './src/event';
 import Network, { traceNetwork } from './src/network';
 import Log, { traceLog } from './src/log';
 import Info from './src/info';
+import HocComp from './src/hoc';
+
 const { width, height } = Dimensions.get('window');
 
 let commandContext = global;
@@ -36,6 +38,7 @@ class VDebug extends PureComponent {
     super(props);
     initTrace();
     this.containerHeight = (height / 3) * 2;
+    this.refsObj = {};
     this.state = {
       commandValue: '',
       showPanel: false,
@@ -82,36 +85,42 @@ class VDebug extends PureComponent {
     this.state.pan.setValue({ x: 0, y: 0 });
   }
 
+  getRef(index) {
+    return ref => {
+      if (!this.refsObj[index]) this.refsObj[index] = ref;
+    };
+  }
+
   addPanels() {
-    let panels = [
+    let defaultPanels = [
       {
         title: 'Log',
-        component: <Log />
+        component: HocComp(Log, this.getRef(0))
       },
       {
         title: 'Network',
-        component: <Network />
+        component: HocComp(Network, this.getRef(1))
       },
       {
         title: 'Info',
-        component: <Info info={this.props.info || {}} />
+        component: HocComp(Info, this.getRef(2)),
+        props: { info: this.props.info }
       }
     ];
     if (this.props.panels && this.props.panels.length) {
       this.props.panels.forEach((item, index) => {
         // support up to five extended panels
         if (index >= 3) return;
-        if (item.title && item.component) panels.push(item);
+        if (item.title && item.component) {
+          item.component = HocComp(item.component, this.getRef(defaultPanels.length));
+          defaultPanels.push(item);
+        }
       });
     }
-    return panels;
+    return defaultPanels;
   }
 
   togglePanel() {
-    // Animated.timing(this.state.panelHeight, {
-    //   toValue: this.state.panelHeight._value ? 0 : this.containerHeight,
-    //   duration: 100
-    // }).start();
     this.state.panelHeight.setValue(this.state.panelHeight._value ? 0 : this.containerHeight);
   }
 
@@ -163,6 +172,17 @@ class VDebug extends PureComponent {
     }
   }
 
+  scrollToTop() {
+    const item = this.refsObj[this.state.currentPageIndex];
+    const instance = item?.getScrollRef && item?.getScrollRef();
+    if (instance) {
+      // FlatList
+      instance.scrollToOffset && instance.scrollToOffset({ animated: true, viewPosition: 0, index: 0 });
+      // ScrollView
+      instance.scrollTo && instance.scrollTo({ x: 0, y: 0, animated: true });
+    }
+  }
+
   renderPanelHeader() {
     return (
       <View style={styles.panelHeader}>
@@ -170,8 +190,12 @@ class VDebug extends PureComponent {
           <TouchableOpacity
             key={index.toString()}
             onPress={() => {
-              this.scrollToPage(index);
-              this.setState({ currentPageIndex: index });
+              if (index != this.state.currentPageIndex) {
+                this.scrollToPage(index);
+                this.setState({ currentPageIndex: index });
+              } else {
+                this.scrollToTop();
+              }
             }}
             style={[styles.panelHeaderItem, index === this.state.currentPageIndex && styles.activeTab]}
           >
@@ -248,7 +272,7 @@ class VDebug extends PureComponent {
           {this.state.panels.map((item, index) => {
             return (
               <View key={index} style={{ width: width }}>
-                {item.component}
+                <item.component {...(item.props ?? {})} />
               </View>
             );
           })}

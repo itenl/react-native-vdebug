@@ -22,7 +22,7 @@ export default class Info extends Component {
     });
   }
 
-  getScrollInstance() {
+  getScrollRef() {
     return this.scrollView;
   }
 
