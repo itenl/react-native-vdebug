@@ -77,6 +77,10 @@ class Log extends Component {
     });
   }
 
+  getScrollInstance() {
+    return this.flatList;
+  }
+
   componentDidMount() {
     this.mountState = true;
     this.setState({
@@ -102,12 +106,6 @@ class Log extends Component {
       logStack.clearLogs();
     }
   };
-
-  scrollToEnd = () => {
-    this.flatList.scrollToEnd({ animated: true });
-  };
-
-  filterCenter() {}
 
   ListHeaderComponent() {
     return (
@@ -195,7 +193,6 @@ class Log extends Component {
           this.flatList = ref;
         }}
         legacyImplementation
-        // onLayout={() => this.flatList.scrollToEnd({ animated: true })}
         // initialNumToRender={20}
         showsVerticalScrollIndicator
         extraData={this.state}
