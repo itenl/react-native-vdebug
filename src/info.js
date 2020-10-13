@@ -45,7 +45,7 @@ export default class Info extends Component {
   render() {
     return (
       <ScrollView style={{ flex: 1, padding: 5 }}>
-        <Text style={{ color: 'black' }}>{this.state.info}</Text>
+        <Text selectable={true} style={{ color: 'black' }}>{this.state.info}</Text>
         <View style={{ marginTop: 1000 }}>
           <Text style={!this.state.enabled && { opacity: 0.05 }}>{`
                                                 .::::.
