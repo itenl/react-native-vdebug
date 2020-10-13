@@ -171,6 +171,10 @@ class Network extends Component {
     });
   }
 
+  getScrollInstance() {
+    return this.flatList;
+  }
+
   componentDidMount() {
     this.mountState = true;
     this.setState({
@@ -375,7 +379,21 @@ class Network extends Component {
   }
 
   render() {
-    return <FlatList showsVerticalScrollIndicator ListHeaderComponent={this.ListHeaderComponent.bind(this)} extraData={this.state} data={this.state.requestIds} stickyHeaderIndices={[0]} renderItem={this.renderItem.bind(this)} ListEmptyComponent={() => <Text> Loading...</Text>} keyExtractor={item => item} />;
+    return (
+      <FlatList
+        ref={ref => {
+          this.flatList = ref;
+        }}
+        showsVerticalScrollIndicator={true}
+        ListHeaderComponent={this.ListHeaderComponent.bind(this)}
+        extraData={this.state}
+        data={this.state.requestIds}
+        stickyHeaderIndices={[0]}
+        renderItem={this.renderItem.bind(this)}
+        ListEmptyComponent={() => <Text> Loading...</Text>}
+        keyExtractor={item => item}
+      />
+    );
   }
 }
 
