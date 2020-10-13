@@ -208,7 +208,7 @@ class VDebug extends PureComponent {
 
   renderCommandBar() {
     return (
-      <KeyboardAvoidingView keyboardVerticalOffset={300} contentContainerStyle={{ flex: 1, flexDirection: 'row' }} behavior={'position'} style={styles.commandBar}>
+      <KeyboardAvoidingView keyboardVerticalOffset={Platform.OS == 'android' ? 0 : 300} contentContainerStyle={{ flex: 1, flexDirection: 'row' }} behavior={'position'} style={styles.commandBar}>
         <TextInput
           ref={ref => {
             this.textInput = ref;
