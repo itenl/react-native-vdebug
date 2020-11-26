@@ -6,6 +6,8 @@ import Network, { traceNetwork } from './src/network';
 import Log, { traceLog } from './src/log';
 import Info from './src/info';
 import HocComp from './src/hoc';
+import Storage from './src/storage';
+import { replaceReg } from './src/tool';
 
 const { width, height } = Dimensions.get('window');
 
@@ -46,7 +48,10 @@ class VDebug extends PureComponent {
       pan: new Animated.ValueXY(),
       scale: new Animated.Value(1),
       panelHeight: new Animated.Value(0),
-      panels: this.addPanels()
+      panels: this.addPanels(),
+      history: [],
+      historyFilter: [],
+      showHistory: false
     };
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -83,6 +88,14 @@ class VDebug extends PureComponent {
 
   componentDidMount() {
     this.state.pan.setValue({ x: 0, y: 0 });
+    Storage.support() &&
+      Storage.get('react-native-vdebug@history').then(res => {
+        if (res) {
+          this.setState({
+            history: res
+          });
+        }
+      });
   }
 
   getRef(index) {
@@ -153,11 +166,15 @@ class VDebug extends PureComponent {
   execCommand() {
     if (!this.state.commandValue) return;
     this.evalInContext(this.state.commandValue, commandContext);
+    this.syncHistory();
     Keyboard.dismiss();
   }
 
   clearCommand() {
     this.textInput.clear();
+    this.setState({
+      historyFilter: []
+    });
   }
 
   scrollToPage(index, animated = true) {
@@ -206,25 +223,89 @@ class VDebug extends PureComponent {
     );
   }
 
+  syncHistory() {
+    if (!Storage.support()) return;
+    const res = this.state.history.filter(f => {
+      return f == this.state.commandValue;
+    });
+    if (res && res.length) return;
+    this.state.history.splice(0, 0, this.state.commandValue);
+    this.state.historyFilter.splice(0, 0, this.state.commandValue);
+    this.setState(
+      {
+        history: this.state.history,
+        historyFilter: this.state.historyFilter
+      },
+      () => {
+        Storage.save('react-native-vdebug@history', this.state.history);
+        this.forceUpdate();
+      }
+    );
+  }
+
+  onChange(text) {
+    const state = { commandValue: text };
+    if (text) {
+      const res = this.state.history.filter(f => f.toLowerCase().match(replaceReg(text)));
+      if (res && res.length) state.historyFilter = res;
+    } else {
+      state.historyFilter = [];
+    }
+    this.setState(state);
+  }
+
   renderCommandBar() {
     return (
-      <KeyboardAvoidingView keyboardVerticalOffset={Platform.OS == 'android' ? 0 : 300} contentContainerStyle={{ flex: 1, flexDirection: 'row' }} behavior={'position'} style={styles.commandBar}>
-        <TextInput
-          ref={ref => {
-            this.textInput = ref;
-          }}
-          style={styles.commandBarInput}
-          placeholderTextColor={'#000000a1'}
-          placeholder="Command..."
-          onChangeText={text => this.setState({ commandValue: text })}
-          value={this.state.commandValue}
-        />
-        <TouchableOpacity style={styles.commandBarBtn} onPress={this.clearCommand.bind(this)}>
-          <Text>X</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.commandBarBtn} onPress={this.execCommand.bind(this)}>
-          <Text>OK</Text>
-        </TouchableOpacity>
+      <KeyboardAvoidingView
+        keyboardVerticalOffset={Platform.OS == 'android' ? 0 : 300}
+        contentContainerStyle={{ flex: 1 }}
+        behavior={'position'}
+        style={{
+          height: this.state.historyFilter.length ? 120 : 40,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: '#d9d9d9'
+        }}
+      >
+        <View style={[styles.historyContainer, { height: this.state.historyFilter.length ? 80 : 0 }]}>
+          <ScrollView>
+            {this.state.historyFilter.map(text => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (text && text.toString) {
+                      this.setState({
+                        commandValue: text.toString()
+                      });
+                    }
+                  }}
+                >
+                  <Text style={{ lineHeight: 25 }}>{text}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+        <View style={styles.commandBar}>
+          <TextInput
+            ref={ref => {
+              this.textInput = ref;
+            }}
+            style={styles.commandBarInput}
+            placeholderTextColor={'#000000a1'}
+            placeholder="Command..."
+            onChangeText={this.onChange.bind(this)}
+            value={this.state.commandValue}
+            onFocus={() => {
+              this.setState({ showHistory: true });
+            }}
+          />
+          <TouchableOpacity style={styles.commandBarBtn} onPress={this.clearCommand.bind(this)}>
+            <Text>X</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.commandBarBtn} onPress={this.execCommand.bind(this)}>
+            <Text>OK</Text>
+          </TouchableOpacity>
+        </View>
       </KeyboardAvoidingView>
     );
   }
@@ -386,10 +467,11 @@ const styles = StyleSheet.create({
     color: '#fff'
   },
   commandBar: {
-    height: 40,
     flexDirection: 'row',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#d9d9d9'
+    borderColor: '#d9d9d9',
+    flexDirection: 'row',
+    height: 40
   },
   commandBarInput: {
     flex: 1,
@@ -402,6 +484,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#eee'
+  },
+  historyContainer: {
+    borderTopWidth: 1,
+    borderTopColor: '#d9d9d9',
+    backgroundColor: '#ffffff',
+    paddingLeft: 10,
+    paddingRight: 5
   }
 });
 

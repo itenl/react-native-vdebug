@@ -42,7 +42,15 @@ function debounce(delay, atBegin, callback) {
   return callback === undefined ? throttle(delay, atBegin, false) : throttle(delay, callback, atBegin !== false);
 }
 
+function replaceReg(str) {
+  const regStr = /\$|\(|\)|\*|\+|\.|\[|\]|\?|\^|\{|\}|\|/gi;
+  return str.replace(regStr, function (input) {
+    return `\\${input}`;
+  });
+}
+
 module.exports = {
   throttle,
-  debounce
+  debounce,
+  replaceReg
 };

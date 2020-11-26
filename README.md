@@ -15,7 +15,7 @@
 - [x] 可视化 Response
 - [x] Log 等级分类
 - [x] 关键字过滤 Log / Network
-- [ ] Command 历史记录 (ing...)
+- [x] Command 历史记录
 - [ ] 导出所有 Log / Network (ing...)
 
 ## Install
