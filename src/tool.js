@@ -43,7 +43,7 @@ function debounce(delay, atBegin, callback) {
 }
 
 function replaceReg(str) {
-  const regStr = /\$|\(|\)|\*|\+|\.|\[|\]|\?|\^|\{|\}|\|/gi;
+  const regStr = /\\|\$|\(|\)|\*|\+|\.|\[|\]|\?|\^|\{|\}|\|/gi;
   return str.replace(regStr, function (input) {
     return `\\${input}`;
   });

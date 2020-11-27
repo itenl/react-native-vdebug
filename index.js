@@ -271,6 +271,7 @@ class VDebug extends PureComponent {
             {this.state.historyFilter.map(text => {
               return (
                 <TouchableOpacity
+                  style={{ borderBottomWidth: 1, borderBottomColor: '#eeeeeea1' }}
                   onPress={() => {
                     if (text && text.toString) {
                       this.setState({
@@ -298,6 +299,7 @@ class VDebug extends PureComponent {
             onFocus={() => {
               this.setState({ showHistory: true });
             }}
+            onSubmitEditing={this.execCommand.bind(this)}
           />
           <TouchableOpacity style={styles.commandBarBtn} onPress={this.clearCommand.bind(this)}>
             <Text>X</Text>
@@ -423,12 +425,12 @@ const styles = StyleSheet.create({
   },
   panelBottom: {
     width,
-    flex: 0.1,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: '#d9d9d9',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#eee'
+    backgroundColor: '#eee',
+    height: 40
   },
   panelBottomBtn: {
     flex: 1,
@@ -489,8 +491,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#d9d9d9',
     backgroundColor: '#ffffff',
-    paddingLeft: 10,
-    paddingRight: 5
+    paddingHorizontal: 10
   }
 });
 
