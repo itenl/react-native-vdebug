@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TextInput, FlatList, Text, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { TextInput, FlatList, Text, StyleSheet, View, TouchableOpacity, Clipboard, TouchableWithoutFeedback, Alert } from 'react-native';
 import event from './event';
 import { debounce } from './tool';
 
@@ -169,20 +169,29 @@ class Log extends Component {
     if (this.state.filterLevel && this.state.filterLevel != item.method) return null;
     if (this.state.filterValue && this.regInstance && !this.regInstance.test(item.data)) return null;
     return (
-      <View style={styles.logItem}>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={{ flex: 0.8 }}>
-            <Text style={styles.logItemTime}>{item.index}</Text>
+      <TouchableWithoutFeedback
+        onLongPress={() => {
+          try {
+            Clipboard.setString(`${item.data}\r\n\r\nLight up the little star and support me.\r\nhttps://github.com/itenl/react-native-vdebug`);
+            Alert.alert('Info', 'Copy successfully', [{ text: 'OK' }]);
+          } catch (error) {}
+        }}
+      >
+        <View style={styles.logItem}>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ flex: 0.8 }}>
+              <Text style={styles.logItemTime}>{item.index}</Text>
+            </View>
+            <View style={{ flex: 0.8 }}>
+              <Text style={styles.logItemTime}>{item.method}</Text>
+            </View>
+            <View style={{ flex: 2 }}>
+              <Text style={styles.logItemTime}>{item.time}</Text>
+            </View>
           </View>
-          <View style={{ flex: 0.8 }}>
-            <Text style={styles.logItemTime}>{item.method}</Text>
-          </View>
-          <View style={{ flex: 2 }}>
-            <Text style={styles.logItemTime}>{item.time}</Text>
-          </View>
+          <Text style={[styles.logItemText, styles[item.method]]}>{item.data}</Text>
         </View>
-        <Text style={[styles.logItemText, styles[item.method]]}>{item.data}</Text>
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 
