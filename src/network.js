@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { TextInput, Clipboard, View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import event from './event';
-import { debounce } from './tool';
+import { debounce, getJSEnvironment, EnvType } from './tool';
 
 let ajaxStack = null;
 
@@ -603,6 +603,6 @@ export default Network;
 export const traceNetwork = () => {
   if (!ajaxStack) {
     ajaxStack = new AjaxStack();
-    proxyAjax(global.originalXMLHttpRequest || global.XMLHttpRequest, ajaxStack);
+    proxyAjax([EnvType.MACINTOSH, EnvType.WINDOWS].includes(getJSEnvironment().name) ? global.XMLHttpRequest : global.originalXMLHttpRequest || global.XMLHttpRequest, ajaxStack);
   }
 };
