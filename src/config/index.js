@@ -7,6 +7,7 @@ export default {
     homepage: 'https://itenl.com',
     repository: packagejson.repository.url,
     description: packagejson.description,
-    version: packagejson.version
+    version: packagejson.version,
+    toStar: 'Light up the little star and support me.'
   }
 };

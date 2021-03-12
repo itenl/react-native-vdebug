@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { TextInput, FlatList, Text, StyleSheet, View, TouchableOpacity, Clipboard, TouchableWithoutFeedback, Alert } from 'react-native';
 import event from './event';
 import { debounce } from './tool';
+import config from './config';
 
 const LEVEL_ENUM = {
   All: '',
@@ -172,7 +173,7 @@ class Log extends Component {
       <TouchableWithoutFeedback
         onLongPress={() => {
           try {
-            Clipboard.setString(`${item.data}\r\n\r\nLight up the little star and support me.\r\nhttps://github.com/itenl/react-native-vdebug`);
+            Clipboard.setString(`${item.data}\r\n\r\n${config.APPINFO.toStar}\r\nhttps://github.com/itenl/react-native-vdebug`);
             Alert.alert('Info', 'Copy successfully', [{ text: 'OK' }]);
           } catch (error) {}
         }}

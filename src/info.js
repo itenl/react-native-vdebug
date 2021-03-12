@@ -1,25 +1,14 @@
 import React, { Component } from 'react';
-import { Clipboard, ScrollView, View, Text } from 'react-native';
+import { Clipboard, ScrollView, View, Text, TouchableOpacity, Linking, Alert } from 'react-native';
 import config from '../src/config';
 
 export default class Info extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      info: '',
-      enabled: false
+      appInfo: '',
+      exteranlInfo: ''
     };
-  }
-
-  verifyPassword() {
-    Clipboard.getString().then(password => {
-      const date = new Date();
-      if (password == `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}|itenl`) {
-        this.setState({
-          enabled: true
-        });
-      }
-    });
   }
 
   getScrollRef() {
@@ -27,23 +16,18 @@ export default class Info extends Component {
   }
 
   componentDidMount() {
-    let info = Object.assign(
-      {
-        APP_INFO: config.APPINFO
-      },
-      { EXTERNAL_INFO: this.props.info }
-    );
-    if (typeof info === 'object') {
-      try {
-        info = JSON.stringify(info, null, 2);
-      } catch (err) {
-        console.log(err);
-      }
+    let appInfo = '';
+    let exteranlInfo = '';
+    try {
+      appInfo = JSON.stringify(config, null, 2);
+      if (typeof this.props.info === 'object') exteranlInfo = JSON.stringify({ EXTERANLINFO: this.props.info }, null, 2);
+    } catch (err) {
+      console.log(err);
     }
     this.setState({
-      info
+      appInfo,
+      exteranlInfo
     });
-    this.verifyPassword();
   }
 
   render() {
@@ -54,32 +38,28 @@ export default class Info extends Component {
         }}
         style={{ flex: 1, padding: 5 }}
       >
-        <Text selectable={true} style={{ color: 'black' }}>
-          {this.state.info}
-        </Text>
-        <View style={{ marginTop: 1000 }}>
-          <Text style={!this.state.enabled && { opacity: 0.05 }}>{`
-                                                .::::.
-                                              .::::::::::.
-                                            ::::::::::::
-                                        ..:::::::::::::'
-                                      ':::::::::::::'
-                                        .:::::::::::
-                                    '::::::::::::::..
-                                    ..:::::::::::::::::.
-                                    ::::::::::::::::::::
-                                  ::::  :::::::::::'       .:::.
-                                  ::::'   '::::::'       .::::::::.
-                                .::::'     :::::     .:::::::':::::.
-                              :.:::'      ::::::  .:::::::::' ':::::.
-                              .::'        :::::.:::::::::'      ':::::.
-                            .::'         ::::::::::::::'           ::::.
-                        ...:::           ::::::::::::'                ::.
-                          ':.            ':::::::::'                  :::::::::.
-                                          '.:::::'                    ':'
-        `}</Text>
-          <Text style={{ color: 'black', textAlign: 'center', margin: 10 }}>Goddess bless you, there will never be BUG.</Text>
-        </View>
+        <TouchableOpacity
+          style={{ borderBottomColor: 'black', borderBottomWidth: 1 }}
+          onPress={() => {
+            Linking.canOpenURL(config.APPINFO.repository)
+              .then(supported => {
+                if (supported) return Linking.openURL(config.APPINFO.repository);
+              })
+              .catch(err => console.log('An error occurred', err));
+          }}
+        >
+          <Text style={{ color: 'black' }}>{this.state.appInfo}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            try {
+              Clipboard.setString(this.state.exteranlInfo);
+              Alert.alert('Info', 'Copy successfully', [{ text: 'OK' }]);
+            } catch (error) {}
+          }}
+        >
+          <Text style={{ color: 'black' }}>{this.state.exteranlInfo}</Text>
+        </TouchableOpacity>
       </ScrollView>
     );
   }
