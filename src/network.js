@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { TextInput, Clipboard, View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import event from './event';
+import config from './config';
 import { debounce, getJSEnvironment, EnvType } from './tool';
 
 let ajaxStack = null;
@@ -483,6 +484,7 @@ function proxyAjax(XHR, stack) {
     XMLReq._requestID = id;
     XMLReq._method = method;
     XMLReq._url = url;
+    XMLReq._headers['vdebug-version'] = config.APPINFO.version;
 
     // mock onreadystatechange
     const _onreadystatechange = XMLReq.onreadystatechange || function () {};
