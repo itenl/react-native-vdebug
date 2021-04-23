@@ -484,7 +484,7 @@ function proxyAjax(XHR, stack) {
     XMLReq._requestID = id;
     XMLReq._method = method;
     XMLReq._url = url;
-    XMLReq._headers['vdebug-version'] = config.APPINFO.version;
+    if(XMLReq._headers) XMLReq._headers['vdebug-version'] = config.APPINFO.version;
 
     // mock onreadystatechange
     const _onreadystatechange = XMLReq.onreadystatechange || function () {};
