@@ -58,4 +58,4 @@ return <VDebug
 
 -------------------
 
-[✶ MIT ✶](./LICENSE)
+ [初始版本](https://github.com/fwon/RNVConsole) / [✶ MIT ✶](./LICENSE)
